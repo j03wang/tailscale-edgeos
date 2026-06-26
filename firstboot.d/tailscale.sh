@@ -39,6 +39,17 @@ After=vyatta-router.service
 	EOF
 fi
 
+# Add an override to tailscaled.service to retry indefinitely with a 15-second gap
+if [ ! -f /config/tailscale/systemd/tailscaled.service.d/restart-policy.conf ]; then
+    cat > /config/tailscale/systemd/tailscaled.service.d/restart-policy.conf <<-EOF
+[Unit]
+StartLimitIntervalSec=0
+
+[Service]
+RestartSec=15s
+    EOF
+fi
+
 if [ ! -L /etc/systemd/system/tailscaled.service.d ]; then
 	ln -s /config/tailscale/systemd/tailscaled.service.d /etc/systemd/system/tailscaled.service.d
 fi
